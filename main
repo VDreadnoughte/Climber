@@ -1,0 +1,139 @@
+#include<iostream>
+#include<cstdlib>
+#include<ctime>
+#include<cmath>
+using namespace std;
+
+class Climber {
+	private:
+    int max_height;
+    int difference3_step;
+    int length;
+	//Если границы смещаются за пределы максимальной вершиной, то ограничить  этой максимальной вершиной//
+    int positive (int max_f, int diff)
+	{
+        if (max_f+diff > max_height)
+		{
+            return max_height;
+        }
+        else
+            return max_f+diff;
+    }
+    //Если границы смещаются в отрицательный диапазон, то ограничить нулем//
+    int negative (int min_f, int diff)
+	{
+        if (min_f-diff < 0)
+		{
+            return 0;
+        }
+        else
+            return min_f-diff;
+    }
+    public:
+    int getMax_height()
+	{
+        return max_height;
+    }
+    void setMax_height(int max_height)
+	{
+        this->max_height = max_height;
+    }
+    int getDifference3_step()
+	{
+        return difference3_step;
+    }
+    void setDifference3_step(int difference3_step)
+	{
+        // Если максимальный перепад трех ближайших вершин больше максимальной, то ограничить максимальной вершиной//
+        if (difference3_step < max_height)
+		{
+            this->difference3_step = difference3_step;
+        }
+        else
+		{
+            this->difference3_step = max_height;
+        }
+    }
+    int getLength()
+	{
+        return length;
+    }
+    void setLength(int length)
+	{
+        if (length > 3)
+		{
+            this->length = length;
+        }
+		else
+		{
+            cout<<"Путь не может быть меньше трех вершин"<<endl;
+        }
+    }
+    void printRoute()
+	{
+		srand(time(NULL));
+        int *route = new int[length];
+        int *temp = new int[3];
+        int max;
+        int min;
+        //Разница между двумя соседними вершинами//
+        int difference = 0;
+        // Генерация первых двух вершин//
+        cout<<difference3_step<<endl;
+        route[0] = difference3_step / 2 + (int)((double)(1 / rand()%100)*difference3_step / 2);
+        route[1] = (int)((double)(1 / rand()%100)*difference3_step);
+        if(route[0] > route[1])
+		{
+            max = route[0];
+            min = route[1];
+        }
+        else
+		{
+            max = route[1];
+            min = route[0];
+        }
+        cout<<route[0] + " ";
+        cout<<route[1] + " ";
+        difference = abs(max-min);
+        for (int i = 2; i < length; i++)
+		{
+            // Границы высоты следующей вершины//
+            // (difference3_step - difference) - дисперсия относительно макс и мин
+            int a = negative(min, difference3_step - difference);
+            int b = positive(max, difference3_step - difference);
+            route[i] = round((float)(1 / rand()%100) * (b - a) + a);
+            //Ищем мин. и максимум двух соседних вершин//
+            if (route[i-1] > route[i])
+			{
+                max = route[i-1];
+                min = route[i];
+            }
+            else
+			{
+                max = route[i];
+                min = route[i-1];
+            }
+            difference = abs(max-min);
+            cout<<route[i] + " ";
+        }
+    }
+};
+
+int main()
+{
+	setlocale(0,"");
+    Climber test;
+    cout<<"Введите длину маршута: ";
+    int length;
+    cin>>length;
+    test.setLength(length);
+    cout<<"Введите максимальную вершину: ";
+    int max_height;
+    cin>>max_height;
+    test.setMax_height(max_height);
+    cout<<"Введите максимальный перепад трех ближайших вершин: ";
+    int step;
+    cin>>step;
+    test.setDifference3_step(step);
+    test.printRoute();
+}
